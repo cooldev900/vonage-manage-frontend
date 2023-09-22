@@ -196,7 +196,7 @@ function App(): ReactElement {
                     <input
                       id="firstName"
                       type="text"
-                      placeholder="Put in your fullname."
+                      placeholder="Put in your beginning row index."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded mb-"
                       {...register('beginRow')}
                     />
@@ -220,7 +220,7 @@ function App(): ReactElement {
                     <input
                       id="firstName"
                       type="textd"
-                      placeholder="Put in your fullname."
+                      placeholder="Put in your ending row index."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded mb-"
                       {...register('endRow')}
                     />
@@ -261,7 +261,7 @@ function App(): ReactElement {
                     <input
                       id="firstName"
                       type="text"
-                      placeholder="Put in your fullname."
+                      placeholder="Put in column name of First Name."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded mb-"
                       {...register('firstName')}
                     />
@@ -286,7 +286,7 @@ function App(): ReactElement {
                       type="text"
                       id="lastName"
                       {...register('lastName')}
-                      placeholder="Put in your fullname."
+                      placeholder="Put in column name of Last Name."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded"
                     />
                   </div>
@@ -307,7 +307,7 @@ function App(): ReactElement {
                       type="text"
                       id="phoneNumber"
                       {...register('phoneNumber')}
-                      placeholder="Put in your fullname."
+                      placeholder="Put in column name of Phone Number."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded"
                     />
                   </div>
@@ -330,7 +330,7 @@ function App(): ReactElement {
                       type="text"
                       id="company"
                       {...register('company')}
-                      placeholder="Put in your fullname."
+                      placeholder="Put in column name of Company."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded"
                     />
                   </div>
@@ -351,7 +351,7 @@ function App(): ReactElement {
                       type="text"
                       id="title"
                       {...register('title')}
-                      placeholder="Put in your fullname."
+                      placeholder="Put in column name of Title."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded"
                     />
                   </div>
@@ -372,7 +372,7 @@ function App(): ReactElement {
                       type="text"
                       id="email"
                       {...register('email')}
-                      placeholder="Put in your fullname."
+                      placeholder="Put in column name of Email."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded"
                     />
                   </div>
@@ -393,7 +393,7 @@ function App(): ReactElement {
                       type="text"
                       id="street"
                       {...register('street')}
-                      placeholder="Put in your fullname."
+                      placeholder="Put in column name of Street."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded"
                     />
                   </div>
@@ -416,7 +416,7 @@ function App(): ReactElement {
                       type="text"
                       id="city"
                       {...register('city')}
-                      placeholder="Put in your fullname."
+                      placeholder="Put in column name of City."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded"
                     />
                   </div>
@@ -437,7 +437,7 @@ function App(): ReactElement {
                       type="text"
                       id="state"
                       {...register('state')}
-                      placeholder="Put in your fullname."
+                      placeholder="Put in column name of State."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded"
                     />
                   </div>
@@ -458,7 +458,7 @@ function App(): ReactElement {
                       type="text"
                       id="zipcode"
                       {...register('zipcode')}
-                      placeholder="Put in your fullname."
+                      placeholder="Put in column name of Zip code."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded"
                     />
                   </div>
@@ -479,7 +479,7 @@ function App(): ReactElement {
                       type="text"
                       id="country"
                       {...register('country')}
-                      placeholder="Put in your fullname."
+                      placeholder="Put in column name of Country."
                       className="border border-gray-300 shadow p-3 w-3/5 rounded"
                     />
                   </div>
