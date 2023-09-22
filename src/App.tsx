@@ -1,22 +1,11 @@
-import { ReactElement, useState } from 'react'
+import { ChangeEvent, ReactElement, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
+import { FormType } from './types'
+import axios from 'axios'
 
-interface FormType {
-  firstName: string
-  lastName?: string
-  company?: string
-  title?: string
-  email?: string
-  street: string
-  city?: string
-  state?: string
-  zipcode?: string
-  country?: string
-  phoneNumber: string
-  messageTemplate: string
-}
+const allowedExtensions = ['csv']
 
 // Define validation schema using Yup
 const validationSchema: Yup.ObjectSchema<FormType> = Yup.object({
@@ -54,44 +43,89 @@ function App(): ReactElement {
     register,
     handleSubmit,
     formState: { errors, isDirty },
-    reset: resetForm,
-    trigger
+    reset: resetForm
   } = useForm<FormType>({
     defaultValues: initialValues,
     resolver: yupResolver(validationSchema)
   })
 
-  const onSubmit: SubmitHandler<FormType> = (data) => {
-    console.log(data)
+  const [fileError, setFileError] = useState<string>('')
+  const [csvFile, setCsvFile] = useState<File>()
+
+  const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0]
+      const fileExtension = file?.type.split('/')[1]
+      if (!allowedExtensions.includes(fileExtension)) {
+        setFileError('Please input a csv file')
+        return
+      }
+      setCsvFile(file)
+    }
+  }
+
+  const onSubmit: SubmitHandler<FormType> = async (data) => {
+    if (!csvFile) {
+      setFileError('Please select a csv file.')
+      return
+    }
+
+    const formdata = new FormData()
+    formdata.append('csvfile', csvFile)
+    Object.keys(data).map((key) =>
+      //@ts-ignore
+      formdata.append(key, data[key] ? data[key] : '-')
+    )
+    const result = await axios.post(
+      'http://localhost:8000/send_sms',
+      formdata,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: 'Bearer your-token'
+        }
+      }
+    )
+    console.log({ result })
   }
 
   return (
-    <div className="p-20 md:w-full">
+    <div className="md:p-20 md:pt-10 p-0 md:w-full">
       <div className="flex flex-col gap-10 whitespace-nowrap">
         <div className="bg-white">
-          <p className="pb-3 text-3xl text-center mb-10">
+          <p className="p-1 text-2xl md:text-3xl text-center md:my-10 sm:my-5">
             Vonage Message Management
           </p>
           <form
-            className="flex flex-wrap md:px-16 sm:px-8"
+            className="flex flex-wrap lg:px-16 md:px-8 px-2"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <div className="md:w-1/2 sm:w-full md:pr-8 sm:pr-4">
-              <div className="md:m-8 sm:m-4">
-                <label className="mb-5 w-64 flex flex-col items-center px-4 py-6 bg-white text-gray-300 rounded-lg shadow-lg tracking-wide uppercase border border-gray-300 hover:border-transparent cursor-pointer hover:bg-blue-500 hover:text-white">
-                  <svg
-                    className="w-8 h-8"
-                    fill="currentColor"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
-                  </svg>
-                  <span className="mt-2 text-base leading-normal">
-                    Select a file
-                  </span>
-                  <input type="file" className="hidden" />
-                </label>
+            <div className="md:w-1/2 w-full lg:pr-8 md:pr-4 pr-1">
+              <div className="m-2 md:m-8 sm:m-4">
+                <div className="mb-5">
+                  <label className="w-full flex flex-col items-center px-4 py-6 bg-white text-gray-300 rounded-lg shadow-lg tracking-wide uppercase border border-gray-300 hover:border-transparent cursor-pointer hover:bg-blue-500 hover:text-white">
+                    <svg
+                      className="w-8 h-8"
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+                    </svg>
+                    <span className="mt-2 text-base leading-normal">
+                      Select a file
+                    </span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept=".csv"
+                      onChange={handleFileInputChange}
+                    />
+                  </label>
+                  {fileError && (
+                    <p className="text-sm text-red-400 mt-2">{fileError}</p>
+                  )}
+                </div>
 
                 <div className="w-full mb-5">
                   <label
@@ -111,16 +145,21 @@ function App(): ReactElement {
                     </p>
                   )}
                 </div>
-                <button className="block w-full bg-blue-500 text-white font-bold py-4 rounded-lg mb-5">
+                <button
+                  type="submit"
+                  // disabled={Object.keys(errors).length > 0}
+                  // onClick={handleSubmit(onSubmit)}
+                  className="hidden md:block w-full bg-blue-500 text-white font-bold py-4 rounded-lg mb-5"
+                >
                   Submit
                 </button>
               </div>
             </div>
 
-            <div className="md:w-1/2 sm:w-full  md:pl-8 sm:pl-4">
-              <div className="md:m-8 sm:m-4">
-                <p className="pb-3 text-2xl  md:px-5 sm:px-3">
-                  Columns for Contacts
+            <div className="md:w-1/2 w-full  lg:pl-8 md:pl-4 pl-1">
+              <div className="m-2 md:m-8 sm:m-4">
+                <p className="pb-3 text-2xl md:text-3xl md:px-5 sm:px-3">
+                  Column Names for Contact Data
                 </p>
 
                 <div className="mb-5 sm:w-full md:px-5 sm:px-3">
@@ -360,6 +399,15 @@ function App(): ReactElement {
                   Column name for Country is required
                 </p> */}
                 </div>
+              </div>
+              <div className="px-3">
+                <button
+                  type="submit"
+                  // disabled={Object.keys(errors).length > 0}
+                  className="block md:hidden w-full bg-blue-500 text-white font-bold py-4 rounded-lg mb-5"
+                >
+                  Submit
+                </button>
               </div>
             </div>
           </form>
