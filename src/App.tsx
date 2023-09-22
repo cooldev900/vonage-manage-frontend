@@ -23,12 +23,12 @@ const validationSchema: Yup.ObjectSchema<FormType> = Yup.object({
   messageTemplate: Yup.string().required('Message template is required'),
   beginRow: Yup.string().test(
     'is-greater-or-equal-one',
-    'Begin Row must be number and greater or equal to 1',
+    'Begin Row must be number and greater or equal to 2',
     function (value) {
       if (!value) return true
       try {
         let beginValue = parseInt(value)
-        return beginValue > 0
+        return beginValue > 1
       } catch (e) {
         return false
       }
@@ -36,13 +36,13 @@ const validationSchema: Yup.ObjectSchema<FormType> = Yup.object({
   ),
   endRow: Yup.string().test(
     'is-greater-or-equal',
-    'End row must be  be number and equal to or greater than start row or 1',
+    'End row must be  be number and equal to or greater than start row or 2',
     function (value) {
       if (!value) return true
       let { beginRow } = this.parent
       if (!beginRow) return true
       try {
-        return parseInt(value) >= parseInt(beginRow)
+        return parseInt(value) > 2 && parseInt(value) >= parseInt(beginRow)
       } catch (e) {
         return false
       }
