@@ -16,4 +16,6 @@ export interface FormType {
   country?: string
   phoneNumber: string
   messageTemplate: string
+  beginRow?: string
+  endRow?: string
 }

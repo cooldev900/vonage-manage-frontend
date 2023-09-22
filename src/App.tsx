@@ -20,7 +20,34 @@ const validationSchema: Yup.ObjectSchema<FormType> = Yup.object({
   zipcode: Yup.string().optional(),
   country: Yup.string().optional(),
   phoneNumber: Yup.string().required('Phone number is required'),
-  messageTemplate: Yup.string().required('Message template is required')
+  messageTemplate: Yup.string().required('Message template is required'),
+  beginRow: Yup.string().test(
+    'is-greater-or-equal-one',
+    'Begin Row must be number and greater or equal to 1',
+    function (value) {
+      if (!value) return true
+      try {
+        let beginValue = parseInt(value)
+        return beginValue > 0
+      } catch (e) {
+        return false
+      }
+    }
+  ),
+  endRow: Yup.string().test(
+    'is-greater-or-equal',
+    'End row must be  be number and equal to or greater than start row or 1',
+    function (value) {
+      if (!value) return true
+      let { beginRow } = this.parent
+      if (!beginRow) return true
+      try {
+        return parseInt(value) >= parseInt(beginRow)
+      } catch (e) {
+        return false
+      }
+    }
+  )
 })
 
 const initialValues = {
@@ -72,10 +99,18 @@ function App(): ReactElement {
 
     const formdata = new FormData()
     formdata.append('csvfile', csvFile)
-    Object.keys(data).map((key) =>
+    Object.keys(data).map((key) => {
+      if (key === 'beginRow') {
+        formdata.append('beginRow', data['beginRow'] ? data['beginRow'] : '-1')
+        return
+      }
+      if (key === 'endRow') {
+        formdata.append('endRow', data['endRow'] ? data['endRow'] : '-1')
+        return
+      }
       //@ts-ignore
       formdata.append(key, data[key] ? data[key] : '-')
-    )
+    })
     const result = await axios.post(
       'http://localhost:8000/send_sms',
       formdata,
@@ -145,6 +180,55 @@ function App(): ReactElement {
                     </p>
                   )}
                 </div>
+
+                <div className="mb-5 sm:w-full md:px-5 sm:px-3">
+                  <div className="flex items-center justify-between gap-[15px]">
+                    <label
+                      htmlFor="firstName"
+                      className="block mb-2 font-bold text-gray-600"
+                    >
+                      Beginning Row
+                    </label>
+                    <input
+                      id="firstName"
+                      type="text"
+                      placeholder="Put in your fullname."
+                      className="border border-gray-300 shadow p-3 w-3/5 rounded mb-"
+                      {...register('beginRow')}
+                    />
+                  </div>
+
+                  {!!errors?.beginRow?.message && (
+                    <p className="text-sm text-red-400 mt-2">
+                      {errors.beginRow.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mb-5 sm:w-full md:px-5 sm:px-3">
+                  <div className="flex items-center justify-between gap-[15px]">
+                    <label
+                      htmlFor="firstName"
+                      className="block mb-2 font-bold text-gray-600"
+                    >
+                      Ending Row
+                    </label>
+                    <input
+                      id="firstName"
+                      type="textd"
+                      placeholder="Put in your fullname."
+                      className="border border-gray-300 shadow p-3 w-3/5 rounded mb-"
+                      {...register('endRow')}
+                    />
+                  </div>
+
+                  {!!errors?.endRow?.message && (
+                    <p className="text-sm text-red-400 mt-2">
+                      {errors.endRow.message}
+                    </p>
+                  )}
+                </div>
+
                 <button
                   type="submit"
                   // disabled={Object.keys(errors).length > 0}
