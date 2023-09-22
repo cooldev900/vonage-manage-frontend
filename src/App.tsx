@@ -113,7 +113,7 @@ function App(): ReactElement {
       //@ts-ignore
       formdata.append(key, data[key] ? data[key] : '-')
     })
-    const result = await axios.post(
+    const { data: resultData } = await axios.post(
       'http://localhost:8000/send_sms',
       formdata,
       {
@@ -123,8 +123,9 @@ function App(): ReactElement {
         }
       }
     )
-    console.log({ result })
-    if (result) resetForm(initialValues)
+    console.log({ resultData })
+    if (resultData?.result === 'success') resetForm(initialValues)
+    else alert('Some error is happened in server. Please retry')
   }
 
   return (
