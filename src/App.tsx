@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactElement, useState } from 'react'
+import { ChangeEvent, ReactElement, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
@@ -80,6 +80,8 @@ function App(): ReactElement {
   const [csvFile, setCsvFile] = useState<File>()
   const [fileName, setFileName] = useState<string>('')
 
+  const ref = useRef<boolean>(false)
+
   const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0]
@@ -94,6 +96,7 @@ function App(): ReactElement {
   }
 
   const onSubmit: SubmitHandler<FormType> = async (data) => {
+    if (ref.current) return
     if (!csvFile) {
       setFileError('Please select a csv file.')
       return
@@ -113,19 +116,26 @@ function App(): ReactElement {
       //@ts-ignore
       formdata.append(key, data[key] ? data[key] : '-')
     })
-    const { data: resultData } = await axios.post(
-      'http://localhost:8000/send_sms',
-      formdata,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: 'Bearer your-token'
+    ref.current = true
+    try {
+      const { data: resultData } = await axios.post(
+        'http://localhost:8000/send_sms',
+        formdata,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: 'Bearer your-token'
+          }
         }
-      }
-    )
-    console.log({ resultData })
-    if (resultData?.result === 'success') resetForm(initialValues)
-    else alert('Some error is happened in server. Please retry')
+      )
+      console.log({ resultData })
+      if (resultData?.result === 'success') {
+        // resetForm(initialValues)
+      } else alert('Some error is happened in server. Please retry')
+    } catch (e) {
+      console.log(e)
+    }
+    ref.current = false
   }
 
   return (
@@ -235,8 +245,7 @@ function App(): ReactElement {
 
                 <button
                   type="submit"
-                  // disabled={Object.keys(errors).length > 0}
-                  // onClick={handleSubmit(onSubmit)}
+                  disabled={ref.current}
                   className="hidden md:block w-full bg-blue-500 text-white font-bold py-4 rounded-lg mb-5"
                 >
                   Submit
@@ -491,7 +500,7 @@ function App(): ReactElement {
               <div className="px-3">
                 <button
                   type="submit"
-                  // disabled={Object.keys(errors).length > 0}
+                  disabled={ref.current}
                   className="block md:hidden w-full bg-blue-500 text-white font-bold py-4 rounded-lg mb-5"
                 >
                   Submit
