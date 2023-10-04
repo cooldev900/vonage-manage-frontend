@@ -131,8 +131,11 @@ function App(): ReactElement {
       console.log({ resultData })
       if (resultData?.result === 'success') {
         // resetForm(initialValues)
-        alert('Successfully sent messages!')
-      } else alert('Some error is happened in server. Please retry')
+        alert(resultData?.message)
+      } else
+        alert(
+          `Some error is happened in server. Please retry. ${resultData?.message}`
+        )
     } catch (e) {
       console.log(e)
     }
